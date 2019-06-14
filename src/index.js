@@ -1,17 +1,7 @@
 import React from 'react';
 
-let appState = {
-  title: {
-    text: "A React Litte Book",
-    color: "red"
-  },
-  content: {
-    text: "React.js Content",
-    color: "blue"
-  }
-}
-
-function createStore(state, stateChanger) {
+function createStore(reducer) {
+  let state = null
   const listeners = []
   const subscribe = (listener) => listeners.push(listener)
   const getState = () => state
@@ -19,10 +9,23 @@ function createStore(state, stateChanger) {
     state = stateChanger(state, action)
     listeners.forEach((listener) => listener())
   }
+  dispatch({})
   return { getState, dispatch, subscribe }
 }
 
 function stateChanger(state, action) {
+  if (!state) {
+    return {
+      title: {
+        text: "A React Litte Book",
+        color: "red"
+      },
+      content: {
+        text: "React.js Content",
+        color: "blue"
+      }
+    }
+  }
   switch (action.type) {
     case 'UPDATE_TITLE_TEXT':
       return {
@@ -65,8 +68,9 @@ function renderContent(newContent, oldContent = {}) {
   contentDOM.style.color = newContent.color
 }
 
-const store = createStore(appState, stateChanger)
+const store = createStore(stateChanger)
 let oldState = store.getState()
+
 store.subscribe(() => {
   const newState = store.getState()
   renderApp(newState, oldState)
