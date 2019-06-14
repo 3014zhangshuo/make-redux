@@ -12,9 +12,14 @@ let appState = {
 }
 
 function createStore(state, stateChanger) {
+  const listeners = []
+  const subscribe = (listener) => listeners.push(listener)
   const getState = () => state
-  const dispatch = (action) => stateChanger(state, action)
-  return { getState, dispatch }
+  const dispatch = (action) => { 
+    stateChanger(state, action)
+    listeners.forEach((listener) => listener())
+  }
+  return { getState, dispatch, subscribe }
 }
 
 function stateChanger(state, action) {
@@ -48,10 +53,8 @@ function renderContent(content) {
 }
 
 const store = createStore(appState, stateChanger)
-
+store.subscribe(() => renderApp(store.getState()))
 
 renderApp(store.getState())
-
 store.dispatch({ type: 'UPDATE_TITLE_TEXT', text: '《React 小书》' })
 store.dispatch({ type: 'UPDATE_TITLE_COLOR', color: 'blue' })
-renderApp(store.getState())
