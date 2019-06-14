@@ -11,7 +11,13 @@ let appState = {
   }
 }
 
-function dispatch(action) {
+function createStore(state, stateChanger) {
+  const getState = () => state
+  const dispatch = (action) => stateChanger(state, action)
+  return { getState, dispatch }
+}
+
+function stateChanger(state, action) {
   switch (action.type) {
     case 'UPDATE_TITLE_TEXT':
       state.title.text = action.text
@@ -41,9 +47,11 @@ function renderContent(content) {
   contentDOM.style.color = content.color
 }
 
+const store = createStore(appState, stateChanger)
 
-renderApp(appState)
 
-dispatch({ type: 'UPDATE_TITLE_TEXT', text: '《React 小书》' })
-dispatch({ type: 'UPDATE_TITLE_COLOR', color: 'blue' })
-renderApp(appState)
+renderApp(store.getState())
+
+store.dispatch({ type: 'UPDATE_TITLE_TEXT', text: '《React 小书》' })
+store.dispatch({ type: 'UPDATE_TITLE_COLOR', color: 'blue' })
+renderApp(store.getState())
